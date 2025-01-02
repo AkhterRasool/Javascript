@@ -1,12 +1,12 @@
-const readline = require('node:readline');
+const readline = require('node:readline')
 
-const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
 
 // We're using a 4x4 matrix for the 3x3 game board
 // to simplify index access and improve readability, avoiding the need for subtractions.
-const EMPTY = ' ';
-const CIRCLE = "O";
-const CROSS = "X";
+const EMPTY = ' '
+const CIRCLE = "O"
+const CROSS = "X"
 const tictactoeBoard = [
     [EMPTY, EMPTY, EMPTY, EMPTY],
     [EMPTY, EMPTY, EMPTY, EMPTY],
@@ -17,12 +17,12 @@ const tictactoeBoard = [
 
 class MatrixInput {
     constructor(row, col) {
-        this.row = row;
-        this.col = col;
+        this.row = row
+        this.col = col
     }
 
     isEmpty() {
-        return tictactoeBoard[this.row][this.col] === EMPTY;
+        return tictactoeBoard[this.row][this.col] === EMPTY
     }
 }
 
@@ -43,7 +43,7 @@ const aiInputs = [
 
 
 let isUserTurn = false
-const userSymbol = CROSS;
+const userSymbol = CROSS
 
 function getWinner() {
     const containsEqualSymbols = (pattern) => {
@@ -64,7 +64,7 @@ function getWinner() {
     ]
 
     if (containsEqualSymbols(diagonal1)) {
-        return returnWinnerName(diagonal1);
+        return returnWinnerName(diagonal1)
     }
 
     const diagonal2 = [
@@ -74,7 +74,7 @@ function getWinner() {
     ]
 
     if (containsEqualSymbols(diagonal2)) {
-        return returnWinnerName(diagonal2);
+        return returnWinnerName(diagonal2)
     }
 
     const horizontal1 = [
@@ -84,7 +84,7 @@ function getWinner() {
     ]
 
     if (containsEqualSymbols(horizontal1)) {
-        return returnWinnerName(horizontal1);
+        return returnWinnerName(horizontal1)
     }
 
     const horizontal2 = [
@@ -94,7 +94,7 @@ function getWinner() {
     ]
 
     if (containsEqualSymbols(horizontal2)) {
-        return returnWinnerName(horizontal2);
+        return returnWinnerName(horizontal2)
     }
 
     const horizontal3 = [
@@ -104,7 +104,7 @@ function getWinner() {
     ]
 
     if (containsEqualSymbols(horizontal3)) {
-        return returnWinnerName(horizontal3);
+        return returnWinnerName(horizontal3)
     }
 
     const vertical1 = [
@@ -114,7 +114,7 @@ function getWinner() {
     ]
 
     if (containsEqualSymbols(vertical1)) {
-        return returnWinnerName(vertical1);
+        return returnWinnerName(vertical1)
     }
 
     const vertical2 = [
@@ -124,7 +124,7 @@ function getWinner() {
     ]
 
     if (containsEqualSymbols(vertical2)) {
-        return returnWinnerName(vertical2);
+        return returnWinnerName(vertical2)
     }
 
     const vertical3 = [
@@ -134,32 +134,32 @@ function getWinner() {
     ]
 
     if (containsEqualSymbols(vertical3)) {
-        return returnWinnerName(vertical3);
+        return returnWinnerName(vertical3)
     }
 
 }
 
 
 function drawBoard() {
-    console.log("\n\nTic Tac Toe Board::\n");
+    console.log("\n\nTic Tac Toe Board::\n")
     
     for (let i = 1; i <= 3; i++) {
-        let rowVal = '';
+        let rowVal = ''
         for (let j = 1; j <= 3; j++) {
             rowVal += `|${tictactoeBoard[i][j]}` 
         }
-        console.log(rowVal);
-        console.log('-'.repeat(rowVal.length));
+        console.log(rowVal)
+        console.log('-'.repeat(rowVal.length))
         
     }
 
-    console.log("\n\n");
+    console.log("\n\n")
 }
 
-let totalAttempts = 9;
+let totalAttempts = 9
 
 async function startGame() {
-    console.log("AI is starting the game.");
+    console.log("AI is starting the game.")
     
     while (totalAttempts > 0) {
         
@@ -176,7 +176,7 @@ async function startGame() {
                 const userInput = await new Promise((resolve, _) => {
                     rl.question(`Please enter ${userInputInvalid ? 'valid ' : ''}row,col as input where you'd like to put ${userSymbol}. Ex: 1,2\n`, input => {
                         resolve(input)
-                    });
+                    })
                 })
                 
                 if (userInput) {
@@ -184,28 +184,29 @@ async function startGame() {
                     userCol = parseInt(userInput.split(',')[1])
                 }
                 userInputInvalid = true
-            } while (userRow < 1 || userRow > 3 || userCol < 1 || userCol > 3 || tictactoeBoard[userRow][userCol] !== EMPTY);
+            } while (userRow < 1 || userRow > 3 || userCol < 1 || userCol > 3 || tictactoeBoard[userRow][userCol] !== EMPTY)
 
-            tictactoeBoard[userRow][userCol] = userSymbol;
+            tictactoeBoard[userRow][userCol] = userSymbol
         }
 
-        drawBoard();
+        drawBoard()
         const winner = getWinner()
         if (winner) {
-            console.log(`\n${winner} has won!!`);
-            break;
+            return winner
         }
 
-        isUserTurn = !isUserTurn;
+        isUserTurn = !isUserTurn
+        totalAttempts--
     }
-    rl.close()
 }
 
-Promise.resolve(startGame())
-.then(val => {
-    console.log("\n\nGame Over!");
-    console.log("Thank you for playing!\n\n")
-
-}).catch(err => {
-    console.error(`${err} has occurred!!`);
-})
+startGame()
+    .then(winner => {
+        winner && console.log(`${winner} has won!!`)
+        console.log("\n\nGame Over!")
+        console.log("Thank you for playing!\n\n")
+    }).catch(err => {
+        console.error(`${err} has occurred.`)
+    }).finally(() => {
+        rl.close()
+    })

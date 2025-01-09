@@ -42,7 +42,6 @@ const aiInputs = [
 ]
 
 
-let isUserTurn = false
 const userSymbol = CROSS
 const aiSymbol = CIRCLE
 
@@ -192,13 +191,34 @@ function getPosToBlockUserVictory() {
     }
 }
 
+async function askUser(question) {
+    return await new Promise((resolve, _) => {
+        rl.question(question, input => {
+            resolve(input)
+        })
+    })
+}
 
 async function playTicTacToe() {
-    console.log("AI is starting the game.")
+    let isUserTurn = false
+
+    const firstAttemptPrompt = await askUser("Would you like to start the game? (y/n): ")
+    
+    const userAcceptedPrompts = ['y', 'yes', 'yeah', 'yup']
+
+    if (!firstAttemptPrompt || userAcceptedPrompts.includes(firstAttemptPrompt)) {
+        isUserTurn = true
+        drawBoard()
+    } else {
+        isUserTurn = false
+    }
+
+    console.log(`${isUserTurn ? "You are starting" : "AI has started"} the game.`)
     
     while (totalAttempts > 0) {
-        
+
         if (!isUserTurn) {
+            console.log("AI is playing now..");
             const aiInput = getPosForAIToWin() || getPosToBlockUserVictory() || aiInputs.find(matrixInput => matrixInput.isEmpty())
             if (aiInput) { 
                 tictactoeBoard[aiInput.row][aiInput.col] = CIRCLE
@@ -209,7 +229,7 @@ async function playTicTacToe() {
 
             do {
                 const userInput = await new Promise((resolve, _) => {
-                    rl.question(`Please enter ${userInputInvalid ? 'valid ' : ''}row,col as input where you'd like to put ${userSymbol}. Ex: 1,2\n`, input => {
+                    rl.question(`It's your turn.\nPlease enter ${userInputInvalid ? 'valid ' : ''}row,col as input where you'd like to put ${userSymbol}. Ex: 1,2\n`, input => {
                         resolve(input)
                     })
                 })

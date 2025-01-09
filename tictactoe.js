@@ -44,6 +44,7 @@ const aiInputs = [
 
 let isUserTurn = false
 const userSymbol = CROSS
+const aiSymbol = CIRCLE
 
 function getWinner() {
     const containsEqualSymbols = (pattern) => {
@@ -158,13 +159,47 @@ function drawBoard() {
 
 let totalAttempts = 9
 
-async function startGame() {
+function getPosForAIToWin() {
+    for (let i = 1; i <= 3; i++) {
+        for (let j = 1; j <= 3; j++) {
+            if (tictactoeBoard[i][j] !== EMPTY) continue
+
+            tictactoeBoard[i][j] = aiSymbol
+            const winner = getWinner()
+            tictactoeBoard[i][j] = EMPTY
+
+            if ("AI" === winner) {
+                return new MatrixInput(i, j)
+            }
+        }
+    }
+}
+
+function getPosToBlockUserVictory() {
+
+    for (let i = 1; i <= 3; i++) {
+        for (let j = 1; j <= 3; j++) {
+            if (tictactoeBoard[i][j] !== EMPTY) continue
+
+            tictactoeBoard[i][j] = userSymbol
+            const winner = getWinner()
+            tictactoeBoard[i][j] = EMPTY
+
+            if ("User" === winner) {
+                return new MatrixInput(i, j)
+            }
+        }
+    }
+}
+
+
+async function playTicTacToe() {
     console.log("AI is starting the game.")
     
     while (totalAttempts > 0) {
         
         if (!isUserTurn) {
-            const aiInput = aiInputs.find(matrixInput => matrixInput.isEmpty())
+            const aiInput = getPosForAIToWin() || getPosToBlockUserVictory() || aiInputs.find(matrixInput => matrixInput.isEmpty())
             if (aiInput) { 
                 tictactoeBoard[aiInput.row][aiInput.col] = CIRCLE
             }
@@ -200,7 +235,7 @@ async function startGame() {
     }
 }
 
-startGame()
+playTicTacToe()
     .then(winner => {
         winner && console.log(`${winner} has won!!`)
         console.log("\n\nGame Over!")

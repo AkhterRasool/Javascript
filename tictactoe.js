@@ -228,13 +228,9 @@ async function playTicTacToe() {
             let userInputInvalid = false
 
             do {
-                const userInput = await new Promise((resolve, _) => {
-                    rl.question(`It's your turn.\nPlease enter ${userInputInvalid ? 'valid ' : ''}row,col as input where you'd like to put ${userSymbol}. Ex: 1,2\n`, input => {
-                        resolve(input)
-                    })
-                })
-                
-                if (userInput) {
+                const userInput = await askUser(`It's your turn.\nPlease enter ${userInputInvalid ? 'a valid ' : ''}row,col as input where you'd like to put ${userSymbol}. Ex: 1,2\n`)
+                const rowColInputRegex = /^[123]{1},[123]{1}$/
+                if (userInput && userInput.match(rowColInputRegex)) {
                     userRow = parseInt(userInput.split(',')[0])
                     userCol = parseInt(userInput.split(',')[1])
                 }
